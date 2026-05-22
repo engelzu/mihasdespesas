@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f9f9f9">
+<link rel="manifest" href="../manifest.json">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/db.js"></script>
+<script src="../js/app.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#dadada",
+                    "secondary-container": "#66fc88",
+                    "tertiary": "#003e7e",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#001b3d",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#4f4253",
+                    "on-error": "#ffffff",
+                    "on-background": "#1a1c1c",
+                    "on-primary-container": "#edb9ff",
+                    "surface-bright": "#f9f9f9",
+                    "primary-fixed-dim": "#eab2ff",
+                    "background": "#f9f9f9",
+                    "surface": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#00468c",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#f3f3f3",
+                    "tertiary-container": "#0055a8",
+                    "surface-tint": "#941cc7",
+                    "primary-container": "#8a05be",
+                    "secondary-fixed-dim": "#48e171",
+                    "surface-container-high": "#e8e8e8",
+                    "outline": "#817284",
+                    "tertiary-fixed": "#d6e3ff",
+                    "on-primary-fixed": "#320047",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#00722f",
+                    "inverse-surface": "#2f3131",
+                    "secondary-fixed": "#69ff8b",
+                    "primary": "#670090",
+                    "on-secondary-fixed": "#002108",
+                    "surface-variant": "#e2e2e2",
+                    "primary-fixed": "#f7d8ff",
+                    "tertiary-fixed-dim": "#a9c7ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "inverse-on-surface": "#f1f1f1",
+                    "on-tertiary-container": "#b2cdff",
+                    "outline-variant": "#d3c1d5",
+                    "inverse-primary": "#eab2ff",
+                    "secondary": "#006e2c",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#005320",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-primary-fixed-variant": "#7400a0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "sm": "12px",
+                    "container-margin": "20px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .expense-card-shadow {
+            box-shadow: 0 4px 12px -2px rgba(103, 0, 144, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 z-50 bg-surface dark:bg-background border-b border-outline-variant/30 flex items-center justify-between px-md pb-xs w-full pt-[max(env(safe-area-inset-top),8px)]">
+<div class="flex items-center gap-md">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary dark:text-primary-fixed-dim">minhasdespesas</h1>
+</div>
+<button onclick="logout()" class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+</button>
+</header>
+<main class="max-w-xl mx-auto px-container-margin mt-lg">
+<!-- Hero Balance Section -->
+<section class="relative mb-xl group">
+<div class="bg-primary-container p-lg rounded-xl text-on-primary shadow-lg overflow-hidden relative active:scale-[0.98] transition-transform duration-300">
+<!-- Abstract Glow -->
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary-fixed-dim/20 rounded-full blur-3xl"></div>
+<div class="relative z-10 flex justify-between items-center">
+    <div class="flex-1">
+        <div class="flex items-center gap-xs mb-xs">
+            <p class="font-label-md text-label-md text-on-primary-container/80 uppercase tracking-widest">Saldo disponível</p>
+            <button onclick="openBudgetModal()" class="flex items-center justify-center p-[2px] rounded-full hover:bg-on-primary-container/10 transition-colors" title="Editar Saldo">
+                <span class="material-symbols-outlined text-[16px] text-on-primary-container/80">edit</span>
+            </button>
+        </div>
+        <div class="flex items-baseline gap-xs">
+            <span class="font-headline-sm text-headline-sm">R$</span>
+            <h2 class="font-display-lg text-display-lg" id="dash-balance">0,00</h2>
+        </div>
+        <p class="font-label-sm text-[10px] text-on-primary-container/60 mt-1 uppercase tracking-wide hidden" id="dash-budget-date-display">Dta Lançamento Saldo: <span id="dash-budget-date-val"></span></p>
+        <div class="mt-lg flex items-center gap-md">
+            <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-primary-container/70">Gastos do mês</span>
+                <span class="font-headline-sm text-headline-sm text-secondary-fixed" id="dash-spent">R$ 0,00</span>
+            </div>
+            <div class="w-px h-8 bg-on-primary-container/20"></div>
+            <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-primary-container/70">Economia</span>
+                <span class="font-headline-sm text-headline-sm text-tertiary-fixed" id="dash-saved">0%</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Methods Totals -->
+    <div class="flex flex-col gap-[2px] bg-on-primary/10 px-sm py-xs rounded-lg backdrop-blur-md border border-white/10 shrink-0">
+        <div class="flex flex-col">
+            <div class="flex items-center gap-[4px] text-on-primary-container/70 mb-[2px]">
+                <span class="material-symbols-outlined text-[14px]">credit_card</span>
+                <span class="font-label-sm text-[10px] uppercase">Crédito</span>
+            </div>
+            <span class="font-label-md text-on-primary" id="dash-total-credit">R$ 0,00</span>
+        </div>
+        <div class="w-full h-px bg-on-primary-container/20 my-[2px]"></div>
+        <div class="flex flex-col">
+            <div class="flex items-center gap-[4px] text-on-primary-container/70 mb-[2px]">
+                <span class="material-symbols-outlined text-[14px]">credit_card</span>
+                <span class="font-label-sm text-[10px] uppercase">Débito</span>
+            </div>
+            <span class="font-label-md text-on-primary" id="dash-total-debit">R$ 0,00</span>
+        </div>
+        <div class="w-full h-px bg-on-primary-container/20 my-[2px]"></div>
+        <div class="flex flex-col">
+            <div class="flex items-center gap-[4px] text-on-primary-container/70 mb-[2px]">
+                <span class="material-symbols-outlined text-[14px]">payments</span>
+                <span class="font-label-sm text-[10px] uppercase">Dinheiro</span>
+            </div>
+            <span class="font-label-md text-on-primary" id="dash-total-cash">R$ 0,00</span>
+        </div>
+        <div class="w-full h-px bg-on-primary-container/20 my-[2px]"></div>
+        <div class="flex flex-col">
+            <div class="flex items-center gap-[4px] text-on-primary-container/70 mb-[2px]">
+                <span class="material-symbols-outlined text-[14px]">pix</span>
+                <span class="font-label-sm text-[10px] uppercase">Pix</span>
+            </div>
+            <span class="font-label-md text-on-primary" id="dash-total-pix">R$ 0,00</span>
+        </div>
+    </div>
+</div>
+</div>
+</section>
+<!-- Decorative Element (Bento-style snippet) -->
+<div class="w-full mt-lg grid grid-cols-2 gap-md mb-lg">
+<div class="bg-secondary-fixed/10 p-md rounded-xl border border-secondary-fixed/20 cursor-pointer hover:bg-secondary-fixed/20 transition-colors" onclick="editMonthlyGoal()">
+<div class="flex items-center justify-between mb-xs">
+    <span class="material-symbols-outlined text-secondary">savings</span>
+    <span class="material-symbols-outlined text-secondary/50 text-[16px]">edit</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-secondary-fixed-variant">Meta Mensal</p>
+<p class="font-headline-sm text-headline-sm text-secondary" id="meta-mensal-val">R$ 0,00</p>
+</div>
+<div class="bg-tertiary-fixed/10 p-md rounded-xl border border-tertiary-fixed/20">
+<span class="material-symbols-outlined text-tertiary mb-xs">trending_up</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-fixed-variant">Gasto Médio</p>
+<p class="font-headline-sm text-headline-sm text-tertiary" id="gasto-medio-val">R$ 0,00</p>
+</div>
+</div>
+<!-- Progress/Budget Card -->
+<section class="mt-xl mb-md">
+<div class="bg-surface-container p-lg rounded-xl">
+<div class="flex items-center justify-between mb-sm">
+<h4 class="font-headline-sm text-[16px] text-on-surface font-bold">Orçamento Mensal</h4>
+<span class="font-label-md text-label-md text-primary" id="dash-budget-percent">0% usado</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" id="dash-budget-bar" style="width: 0%"></div>
+</div>
+<p class="mt-xs font-label-sm text-label-sm text-on-surface-variant" id="dash-budget-text">Você ainda tem R$ 0,00 para gastar este mês.</p>
+</div>
+</section>
+</main>
+
+<!-- Budget Edit Modal -->
+<div id="budget-modal" class="fixed inset-0 z-[100] bg-inverse-surface/40 backdrop-blur-sm hidden flex items-center justify-center px-container-margin opacity-0 transition-opacity duration-300">
+    <div class="bg-surface-container-lowest p-lg rounded-xl w-full max-w-sm expense-card-shadow scale-95 transition-transform duration-300 transform">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Saldo Disponível</h3>
+        <p class="font-body-md text-on-surface-variant mb-md">Defina o valor total que você tem disponível. Suas despesas serão deduzidas deste valor.</p>
+        
+        <div class="relative mb-lg">
+            <label class="font-label-md text-label-md text-outline block mb-xs">Valor do Saldo</label>
+            <span class="absolute left-md top-[36px] text-on-surface-variant font-headline-sm">R$</span>
+            <input type="number" id="budget-input" class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg pl-[48px] pr-md py-sm transition-all focus:bg-white focus:border-primary text-on-surface font-headline-sm outline-none focus:ring-2 focus:ring-primary/20" placeholder="0.00" step="0.01">
+        </div>
+        
+        <div class="relative mb-lg">
+            <label class="font-label-md text-label-md text-outline block mb-xs">Data de Lançamento</label>
+            <input type="date" id="budget-date" class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg px-md py-sm transition-all focus:bg-white focus:border-primary text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary/20" required>
+        </div>
+        
+        <div class="flex items-center justify-end gap-sm">
+            <button onclick="closeBudgetModal()" class="px-md py-sm rounded-full font-label-md text-primary hover:bg-primary/10 transition-colors">Cancelar</button>
+            <button onclick="saveBudgetModal()" class="px-md py-sm bg-primary text-on-primary rounded-full font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-lg">Salvar</button>
+        </div>
+    </div>
+</div>
+<!-- FAB -->
+<button class="fixed bottom-24 right-container-margin w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl shadow-primary/40 flex items-center justify-center z-40 active:scale-90 hover:-translate-y-1 transition-all duration-300 hover:bg-primary-container" onclick="navigateTo('../adicionar_despesa/code.html')">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<!-- Bottom Navigation with Glassmorphism -->
+<nav class="fixed bottom-0 w-full bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-center px-gutter pb-safe pt-xs z-50 transition-all">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold active:scale-90 transition-all duration-300 hover:bg-surface-container-lowest p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:scale-90 transition-all duration-300 hover:bg-surface-container-lowest p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md">Adicionar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:scale-90 transition-all duration-300 hover:bg-surface-container-lowest p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">Histórico</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:scale-90 transition-all duration-300 hover:bg-surface-container-lowest p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="ios_share">ios_share</span>
+<span class="font-label-md text-label-md">Exportar</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for chips
+        document.querySelectorAll('section > div.flex-shrink-0').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('section > div.flex-shrink-0').forEach(c => {
+                    c.classList.remove('bg-primary/10', 'text-primary', 'border-primary/40');
+                    c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant', 'border-outline-variant/20');
+                });
+                this.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant', 'border-outline-variant/20');
+                this.classList.add('bg-primary/10', 'text-primary', 'border-primary/40');
+            });
+        });
+
+        async function renderDashboard() {
+            const stats = await getDashboardStats();
+            document.getElementById('dash-balance').innerText = formatCurrency(stats.balance).replace('R$', '').trim();
+            document.getElementById('dash-spent').innerText = formatCurrency(stats.monthlySpent);
+            document.getElementById('dash-saved').innerText = (100 - stats.budgetUsedPercent).toFixed(0) + '%';
+            document.getElementById('dash-budget-percent').innerText = stats.budgetUsedPercent.toFixed(0) + '% usado';
+            document.getElementById('dash-budget-bar').style.width = stats.budgetUsedPercent + '%';
+            document.getElementById('dash-budget-text').innerText = `Você ainda tem ${formatCurrency(stats.budgetRemaining)} para gastar este mês.`;
+            document.getElementById('dash-total-credit').innerText = formatCurrency(stats.monthlySpentCredit || 0);
+            document.getElementById('dash-total-debit').innerText = formatCurrency(stats.monthlySpentDebit || 0);
+            document.getElementById('dash-total-cash').innerText = formatCurrency(stats.monthlySpentCash || 0);
+            document.getElementById('dash-total-pix').innerText = formatCurrency(stats.monthlySpentPix || 0);
+            
+            const dateDisplay = document.getElementById('dash-budget-date-display');
+            if (stats.budgetDate) {
+                const parts = stats.budgetDate.split('-');
+                if(parts.length === 3) {
+                    document.getElementById('dash-budget-date-val').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    dateDisplay.classList.remove('hidden');
+                }
+            } else {
+                dateDisplay.classList.add('hidden');
+            }
+
+            const goal = stats.monthlyGoal || 0;
+            document.getElementById('meta-mensal-val').innerText = formatCurrency(goal).replace('R$', 'R$ ').trim();
+            
+            const expenses = await getExpenses();
+            const currentMonthExpenses = expenses.filter(exp => {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                const d = new Date(exp.date + 'T12:00:00');
+                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+            });
+            const avg = currentMonthExpenses.length > 0 ? (stats.monthlySpent / currentMonthExpenses.length) : 0;
+            document.getElementById('gasto-medio-val').innerText = formatCurrency(avg).replace('R$', 'R$ ').trim();
+        }
+
+        // Render data on load
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    renderDashboard();
+                } else {
+                    window.location.replace('../boas_vindas/code.html');
+                }
+            });
+        });
+
+        window.editMonthlyGoal = async function() {
+            const profile = await getProfile();
+            const currentGoal = profile.monthlyGoal || 0;
+            customPrompt('Defina sua Meta Mensal:', currentGoal, async (val) => {
+                const num = parseFloat(val);
+                if(!isNaN(num) && num >= 0) {
+                    await setMonthlyGoal(num);
+                    renderDashboard();
+                } else {
+                    customAlert('Valor inválido. Insira apenas números.');
+                }
+            });
+        };
+
+        async function openBudgetModal() {
+            const modal = document.getElementById('budget-modal');
+            const input = document.getElementById('budget-input');
+            const dateInput = document.getElementById('budget-date');
+            const profile = await getProfile();
+            
+            input.value = profile.monthlyBudget || 3000;
+            if (profile.budgetDate) {
+                dateInput.value = profile.budgetDate;
+            } else {
+                dateInput.valueAsDate = new Date();
+            }
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeBudgetModal() {
+            const modal = document.getElementById('budget-modal');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function saveBudgetModal() {
+            const input = document.getElementById('budget-input');
+            const dateInput = document.getElementById('budget-date');
+            const val = parseFloat(input.value);
+            const dateVal = dateInput.value;
+            
+            if (!isNaN(val) && val >= 0 && dateVal) {
+                await setMonthlyBudget(val, dateVal);
+                closeBudgetModal();
+                setTimeout(() => renderDashboard(), 300);
+            } else {
+                customAlert('Por favor, insira um valor válido e selecione uma data.');
+            }
+        }
+    </script>
+</body></html>
