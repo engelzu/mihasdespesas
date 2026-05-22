@@ -392,11 +392,19 @@
                 data.items.forEach(exp => {
                     const dateObj = new Date(exp.date + 'T12:00:00');
                     const day = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+                    
+                    const isIncome = exp.type === 'income';
+                    const amountColor = isIncome ? 'text-secondary' : 'text-error';
+                    const amountSign = isIncome ? '+' : '-';
+                    const iconColor = isIncome ? 'text-secondary' : 'text-primary';
+                    const bgIconColor = isIncome ? 'bg-secondary/10' : 'bg-surface-container-low';
+                    const iconName = isIncome ? 'add' : getIconForCategory(exp.category);
+
                     html += `
                         <div class="bg-surface-container-lowest p-md rounded-lg flex items-center justify-between border border-neutral-200 expense-card-shadow hover:scale-[1.01] transition-transform cursor-pointer">
                         <div class="flex items-center gap-md">
-                        <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
-                        <span class="material-symbols-outlined">${getIconForCategory(exp.category)}</span>
+                        <div class="w-10 h-10 rounded-full ${bgIconColor} flex items-center justify-center ${iconColor}">
+                        <span class="material-symbols-outlined">${iconName}</span>
                         </div>
                         <div>
                         <p class="font-body-lg text-body-lg font-bold text-on-surface">${exp.description}</p>
@@ -404,7 +412,7 @@
                         </div>
                         </div>
                         <div class="text-right flex flex-col items-end gap-1">
-                        <p class="font-body-lg text-body-lg font-bold text-error">- ${formatCurrency(exp.amount)}</p>
+                        <p class="font-body-lg text-body-lg font-bold ${amountColor}">${amountSign} ${formatCurrency(exp.amount)}</p>
                         <button onclick="handleDeleteExpense('${exp.id}')" class="text-outline-variant hover:text-error transition-colors flex items-center justify-center p-1 rounded-full hover:bg-error/10" title="Excluir">
                             <span class="material-symbols-outlined text-[18px]">delete</span>
                         </button>
