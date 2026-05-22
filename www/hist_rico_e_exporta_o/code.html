@@ -185,7 +185,7 @@
     <div class="flex flex-col md:flex-row gap-md mb-lg">
 <div class="relative flex-grow">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
-<input class="w-full pl-[44px] pr-md py-sm bg-surface-container-lowest border-none border-b-2 border-outline-variant focus:ring-0 focus:border-primary font-body-md text-body-md transition-all outline-none focus:ring-2 focus:ring-primary/20" placeholder="Buscar despesa..." type="text"/>
+<input id="search-input" oninput="handleSearch()" class="w-full pl-[44px] pr-md py-sm bg-surface-container-lowest border-none border-b-2 border-outline-variant focus:ring-0 focus:border-primary font-body-md text-body-md transition-all outline-none focus:ring-2 focus:ring-primary/20" placeholder="Buscar despesa..." type="text"/>
 </div>
 <div class="flex gap-xs overflow-x-auto pb-xs" id="category-filters-container">
 <!-- Populated via JS -->
@@ -339,6 +339,12 @@
             renderHistory(filter === 'Todos' ? null : filter);
         }
 
+        function handleSearch() {
+            const activePill = document.querySelector('.bg-surface-container-high.text-on-surface');
+            const filter = activePill ? activePill.innerText : 'Todos';
+            renderHistory(filter === 'Todos' ? null : filter);
+        }
+
         async function renderHistory(categoryFilter = null) {
             const container = document.getElementById('history-container');
             const monthSelect = document.getElementById('month-filter');
@@ -356,6 +362,12 @@
                     const m = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
                     return (m.charAt(0).toUpperCase() + m.slice(1)) === monthFilter;
                 });
+            }
+
+            const searchInput = document.getElementById('search-input');
+            const searchFilter = searchInput ? searchInput.value.toLowerCase() : '';
+            if (searchFilter) {
+                expenses = expenses.filter(e => e.description.toLowerCase().includes(searchFilter));
             }
 
             currentExpensesRendered = expenses;
