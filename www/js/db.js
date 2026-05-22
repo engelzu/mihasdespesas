@@ -177,6 +177,7 @@ async function getDashboardStats() {
     const currentYear = now.getFullYear();
     
     let monthlySpent = 0;
+    let monthlyIncome = 0;
     let monthlySpentCredit = 0;
     let monthlySpentDebit = 0;
     let monthlySpentCash = 0;
@@ -189,23 +190,28 @@ async function getDashboardStats() {
 
     monthlyExpenses.forEach(exp => {
         const amount = parseFloat(exp.amount);
-        monthlySpent += amount;
-        
-        const method = (exp.paymentMethod || '').toLowerCase();
-        if (method.includes('crédito') || method === 'credito') {
-            monthlySpentCredit += amount;
-        } else if (method.includes('débito') || method === 'debito') {
-            monthlySpentDebit += amount;
-        } else if (method.includes('pix')) {
-            monthlySpentPix += amount;
+        if (exp.type === 'income') {
+            monthlyIncome += amount;
         } else {
-            monthlySpentCash += amount;
+            monthlySpent += amount;
+            
+            const method = (exp.paymentMethod || '').toLowerCase();
+            if (method.includes('crédito') || method === 'credito') {
+                monthlySpentCredit += amount;
+            } else if (method.includes('débito') || method === 'debito') {
+                monthlySpentDebit += amount;
+            } else if (method.includes('pix')) {
+                monthlySpentPix += amount;
+            } else {
+                monthlySpentCash += amount;
+            }
         }
     });
 
     const budget = profile.monthlyBudget || 3000;
-    const remaining = budget - monthlySpent;
-    const usedPercent = budget > 0 ? (monthlySpent / budget) * 100 : 0;
+    const totalAvailable = budget + monthlyIncome;
+    const remaining = totalAvailable - monthlySpent;
+    const usedPercent = totalAvailable > 0 ? (monthlySpent / totalAvailable) * 100 : 0;
 
     return {
         balance: remaining,

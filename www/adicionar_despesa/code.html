@@ -150,6 +150,26 @@
 <!-- Glassmorphism Container / Form -->
 <div class="w-full max-w-md bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-lg form-shadow border border-outline-variant/20">
 <form class="space-y-md" id="expenseForm">
+<!-- Tipo -->
+<div class="space-y-xs mb-sm">
+<label class="font-label-md text-label-md text-outline block mb-xs">Tipo de Lançamento</label>
+<div class="grid grid-cols-2 gap-sm">
+<label class="cursor-pointer">
+<input type="radio" name="expense-type" value="expense" class="peer sr-only" checked required>
+<div class="flex items-center justify-center gap-xs p-sm rounded-lg border-2 border-outline-variant/40 bg-surface-container-low peer-checked:border-error peer-checked:bg-error/10 peer-checked:text-error transition-all text-on-surface-variant hover:bg-surface-container">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+<span class="font-label-md">Despesa</span>
+</div>
+</label>
+<label class="cursor-pointer">
+<input type="radio" name="expense-type" value="income" class="peer sr-only">
+<div class="flex items-center justify-center gap-xs p-sm rounded-lg border-2 border-outline-variant/40 bg-surface-container-low peer-checked:border-secondary peer-checked:bg-secondary/10 peer-checked:text-secondary transition-all text-on-surface-variant hover:bg-surface-container">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="font-label-md">Receita / Saldo</span>
+</div>
+</label>
+</div>
+</div>
 <!-- Descrição -->
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-outline" for="description">Descrição</label>
@@ -171,10 +191,11 @@
 <input class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg px-md py-sm transition-all focus:bg-white focus:border-primary text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary/20" id="date" required="" type="date"/>
 </div>
 </div>
+<div id="expense-only-fields" class="space-y-md transition-all">
 <!-- Categoria -->
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-outline" for="category">Categoria</label>
-<select class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg px-md py-sm transition-all focus:bg-white focus:border-primary text-on-surface font-body-md appearance-none outline-none focus:ring-2 focus:ring-primary/20" id="category" required="">
+<select class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg px-md py-sm transition-all focus:bg-white focus:border-primary text-on-surface font-body-md appearance-none outline-none focus:ring-2 focus:ring-primary/20" id="category">
 <option disabled="" selected="" value="">Selecione uma categoria</option>
 <!-- Populated via JS -->
 </select>
@@ -184,7 +205,7 @@
 <label class="font-label-md text-label-md text-outline block mb-xs">Forma de Pagamento</label>
 <div class="grid grid-cols-2 gap-sm">
 <label class="cursor-pointer">
-<input type="radio" name="payment-method" value="dinheiro" class="peer sr-only" required>
+<input type="radio" name="payment-method" value="dinheiro" class="peer sr-only">
 <div class="flex items-center justify-center gap-xs p-sm rounded-lg border-2 border-outline-variant/40 bg-surface-container-low peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all text-on-surface-variant hover:bg-surface-container">
 <span class="material-symbols-outlined text-[18px]">payments</span>
 <span class="font-label-md">Dinheiro</span>
@@ -213,6 +234,7 @@
 </label>
 </div>
 </div>
+</div>
 <!-- Info Box for Credit (Conditional) -->
 <div class="hidden animate-in fade-in slide-in-from-top-2 duration-300" id="creditInfo">
 <div class="bg-tertiary-fixed text-on-tertiary-fixed p-md rounded-xl flex items-start gap-sm">
@@ -239,7 +261,7 @@
 <!-- Decorative Element (Bento-style snippet) -->
 </main>
 <!-- BottomNavBar -->
-<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-background border-t border-outline-variant/20 rounded-t-xl flex justify-around items-center px-gutter pb-safe pt-xs">
+<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-background border-t border-outline-variant/20 rounded-t-xl flex justify-around items-center px-gutter pb-6 pt-xs">
 <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-lowest active:scale-90 transition-all duration-300">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-md text-label-md">Início</span>
@@ -282,6 +304,19 @@
             const dateInput = document.getElementById('date');
             const forecastDate = document.getElementById('forecastDate');
 
+            const typeRadios = document.querySelectorAll('input[name="expense-type"]');
+            const expenseOnlyFields = document.getElementById('expense-only-fields');
+            typeRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.value === 'income') {
+                        expenseOnlyFields.classList.add('hidden');
+                        document.querySelector('h2').innerText = 'Novo Lançamento';
+                    } else {
+                        expenseOnlyFields.classList.remove('hidden');
+                        document.querySelector('h2').innerText = 'Nova Despesa';
+                    }
+                });
+            });
 
             const updateForecast = () => {
                 if (dateInput.value) {
@@ -317,10 +352,12 @@
                 let amount = document.getElementById('amount').value;
                 amount = amount.replace(',', '.');
                 const date = document.getElementById('date').value;
-                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-                let category = 'Outros';
+                const type = document.querySelector('input[name="expense-type"]:checked').value;
+                const paymentMethodInput = document.querySelector('input[name="payment-method"]:checked');
+                const paymentMethod = paymentMethodInput ? paymentMethodInput.value : '';
+                let category = type === 'expense' ? 'Outros' : 'Receita';
                 const catEl = document.getElementById('category');
-                if (catEl) category = catEl.value;
+                if (catEl && type === 'expense') category = catEl.value;
                 
                 // Formata paymentMethod pra ficar bonito
                 const methodMap = {
@@ -330,10 +367,11 @@
                 };
                 
                 await addExpense({
+                    type: type,
                     description,
                     amount: parseFloat(amount),
                     date,
-                    paymentMethod: methodMap[paymentMethod] || paymentMethod,
+                    paymentMethod: type === 'expense' ? (methodMap[paymentMethod] || paymentMethod) : '',
                     category
                 });
 
