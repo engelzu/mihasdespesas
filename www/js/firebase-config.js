@@ -11,3 +11,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// Enable offline persistence for true offline support
+db.enablePersistence()
+  .catch((err) => {
+      console.log("Offline persistence error:", err.code);
+  });
