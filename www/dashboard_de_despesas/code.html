@@ -221,7 +221,7 @@
 </div>
 <div class="bg-tertiary-fixed/10 p-md rounded-xl border border-tertiary-fixed/20">
 <span class="material-symbols-outlined text-tertiary mb-xs">trending_up</span>
-<p class="font-label-sm text-label-sm text-on-tertiary-fixed-variant">Gasto Médio</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-fixed-variant">Gasto Diário</p>
 <p class="font-headline-sm text-headline-sm text-tertiary" id="gasto-medio-val">R$ 0,00</p>
 </div>
 </div>
@@ -326,15 +326,9 @@
             const goal = stats.monthlyGoal || 0;
             document.getElementById('meta-mensal-val').innerText = formatCurrency(goal).replace('R$', 'R$ ').trim();
             
-            const expenses = await getExpenses();
-            const currentMonthExpenses = expenses.filter(exp => {
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                const d = new Date(exp.date + 'T12:00:00');
-                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-            });
-            const avg = currentMonthExpenses.length > 0 ? (stats.monthlySpent / currentMonthExpenses.length) : 0;
+            const now = new Date();
+            const dayOfMonth = now.getDate();
+            const avg = stats.monthlySpent > 0 ? (stats.monthlySpent / dayOfMonth) : 0;
             document.getElementById('gasto-medio-val').innerText = formatCurrency(avg).replace('R$', 'R$ ').trim();
         }
 
