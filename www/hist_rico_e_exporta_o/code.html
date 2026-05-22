@@ -337,7 +337,7 @@
             // Auto-select current month if it exists in list
             const now = new Date();
             const currMonthYear = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-            const currCapitalized = currMonthYear.charAt(0).toUpperCase() + currMonthYear.slice(1);
+            const currCapitalized = (currMonthYear.charAt(0).toUpperCase() + currMonthYear.slice(1)).trim();
             if (monthsArr.includes(currCapitalized)) {
                 select.value = currCapitalized;
             }
@@ -370,7 +370,7 @@
                 expenses = expenses.filter(e => {
                     const dateObj = new Date(e.date + 'T12:00:00');
                     const m = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-                    return (m.charAt(0).toUpperCase() + m.slice(1)) === monthFilter;
+                    return m.toLowerCase().trim() === monthFilter.toLowerCase().trim();
                 });
             }
 
@@ -484,7 +484,7 @@
             const filtered = expenses.filter(exp => {
                 const d = new Date(exp.date + 'T12:00:00');
                 const monthYear = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-                return monthYear.toLowerCase() === selectedMonth.toLowerCase();
+                return monthYear.toLowerCase().trim() === selectedMonth.toLowerCase().trim();
             });
             
             if (filtered.length === 0) {

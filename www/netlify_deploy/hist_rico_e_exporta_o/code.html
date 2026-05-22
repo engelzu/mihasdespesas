@@ -225,9 +225,17 @@
         </div>
         
         <!-- Footer -->
-        <div class="flex justify-between font-bold text-[18px] mb-md px-xs">
-            <span>TOTAL R$</span>
-            <span id="receipt-total"></span>
+        <div class="flex justify-between font-bold text-[14px] mb-[2px] px-xs text-secondary">
+            <span>RECEITAS R$</span>
+            <span id="receipt-total-income"></span>
+        </div>
+        <div class="flex justify-between font-bold text-[14px] mb-[2px] px-xs text-error">
+            <span>DESPESAS R$</span>
+            <span id="receipt-total-expense"></span>
+        </div>
+        <div class="flex justify-between font-bold text-[16px] mb-md px-xs border-t border-dashed border-gray-400 pt-[2px] mt-[2px]">
+            <span>SALDO R$</span>
+            <span id="receipt-total-net"></span>
         </div>
         
         <p class="text-center text-[10px] mb-md text-gray-500">Obrigado por usar Minhas Despesas!</p>
@@ -446,10 +454,11 @@
             if(expenses.length === 0) return customAlert('Nenhum dado para exportar com os filtros atuais.');
             
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Data,Descrição,Categoria,Forma de Pagamento,Valor\n";
+            csvContent += "Data,Descrição,Tipo,Categoria,Forma de Pagamento,Valor\n";
             
             expenses.forEach(function(rowArray) {
-                let row = `"${rowArray.date}","${rowArray.description}","${rowArray.category}","${rowArray.paymentMethod}","${rowArray.amount}"`;
+                let tipo = rowArray.type === 'income' ? 'Receita' : 'Despesa';
+                let row = `"${rowArray.date}","${rowArray.description}","${tipo}","${rowArray.category}","${rowArray.paymentMethod || ''}","${rowArray.amount}"`;
                 csvContent += row + "\r\n";
             });
             
@@ -490,19 +499,26 @@
             
             receiptDate.innerText = `EXTRATO: ${selectedMonth.toUpperCase()}`;
             
-            let total = 0;
+            let totalIncome = 0;
+            let totalExpense = 0;
             receiptItems.innerHTML = filtered.map(exp => {
-                total += parseFloat(exp.amount);
-                let desc = exp.description.substring(0, 18).toUpperCase();
+                let amount = parseFloat(exp.amount);
+                let isIncome = exp.type === 'income';
+                if (isIncome) totalIncome += amount;
+                else totalExpense += amount;
+                
+                let desc = exp.description.substring(0, 15).toUpperCase();
                 return `
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center ${isIncome ? 'text-secondary' : ''}">
                         <span class="truncate pr-xs">${desc}</span>
-                        <span class="flex-shrink-0">${parseFloat(exp.amount).toFixed(2).replace('.', ',')}</span>
+                        <span class="flex-shrink-0">${isIncome ? '+' : '-'} ${amount.toFixed(2).replace('.', ',')}</span>
                     </div>
                 `;
             }).join('');
             
-            receiptTotal.innerText = total.toFixed(2).replace('.', ',');
+            document.getElementById('receipt-total-income').innerText = totalIncome.toFixed(2).replace('.', ',');
+            document.getElementById('receipt-total-expense').innerText = totalExpense.toFixed(2).replace('.', ',');
+            document.getElementById('receipt-total-net').innerText = (totalIncome - totalExpense).toFixed(2).replace('.', ',');
             
             receiptModal.classList.remove('hidden');
             setTimeout(() => {

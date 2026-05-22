@@ -80,8 +80,9 @@ async function logout() {
 
 // Get user profile data (budget, categories)
 async function getProfile() {
-    if (!currentUser) return defaultData;
-    const doc = await db.collection('users').doc(currentUser.uid).get();
+    const user = firebase.auth().currentUser || currentUser;
+    if (!user) return defaultData;
+    const doc = await db.collection('users').doc(user.uid).get();
     if (doc.exists) {
         return doc.data();
     }
@@ -155,9 +156,10 @@ async function addExpense(expense) {
 
 // Get Expenses
 async function getExpenses() {
-    if (!currentUser) return [];
+    const user = firebase.auth().currentUser || currentUser;
+    if (!user) return [];
     // Ordered by date desc
-    const snapshot = await db.collection('users').doc(currentUser.uid).collection('expenses').orderBy('date', 'desc').get();
+    const snapshot = await db.collection('users').doc(user.uid).collection('expenses').orderBy('date', 'desc').get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 

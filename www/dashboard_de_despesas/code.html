@@ -211,12 +211,15 @@
 </section>
 <!-- Decorative Element (Bento-style snippet) -->
 <div class="w-full mt-lg grid grid-cols-2 gap-md mb-lg">
-<div class="bg-secondary-fixed/10 p-md rounded-xl border border-secondary-fixed/20 cursor-pointer hover:bg-secondary-fixed/20 transition-colors" onclick="editMonthlyGoal()">
+<div class="bg-secondary-fixed/10 p-md rounded-xl border border-secondary-fixed/20 cursor-pointer transition-colors" id="meta-card" onclick="editMonthlyGoal()">
 <div class="flex items-center justify-between mb-xs">
-    <span class="material-symbols-outlined text-secondary">savings</span>
+    <div class="flex items-center gap-xs">
+        <span class="material-symbols-outlined text-secondary" id="meta-icon">savings</span>
+        <span class="material-symbols-outlined text-[18px] hidden" id="meta-trend-icon">trending_up</span>
+    </div>
     <span class="material-symbols-outlined text-secondary/50 text-[16px]">edit</span>
 </div>
-<p class="font-label-sm text-label-sm text-on-secondary-fixed-variant">Meta Mensal</p>
+<p class="font-label-sm text-label-sm text-on-secondary-fixed-variant" id="meta-title">Meta Mensal</p>
 <p class="font-headline-sm text-headline-sm text-secondary" id="meta-mensal-val">R$ 0,00</p>
 </div>
 <div class="bg-tertiary-fixed/10 p-md rounded-xl border border-tertiary-fixed/20">
@@ -325,6 +328,33 @@
 
             const goal = stats.monthlyGoal || 0;
             document.getElementById('meta-mensal-val').innerText = formatCurrency(goal).replace('R$', 'R$ ').trim();
+            
+            const metaCard = document.getElementById('meta-card');
+            const metaIcon = document.getElementById('meta-icon');
+            const metaTrendIcon = document.getElementById('meta-trend-icon');
+            const metaTitle = document.getElementById('meta-title');
+            const metaVal = document.getElementById('meta-mensal-val');
+            
+            if (goal > 0) {
+                metaTrendIcon.classList.remove('hidden');
+                if (stats.monthlySpent > goal) {
+                    metaCard.className = "bg-error/10 p-md rounded-xl border border-error/20 cursor-pointer hover:bg-error/20 transition-colors";
+                    metaIcon.className = "material-symbols-outlined text-error";
+                    metaTrendIcon.className = "material-symbols-outlined text-[18px] text-error";
+                    metaTrendIcon.innerText = "trending_up";
+                    metaTitle.className = "font-label-sm text-label-sm text-error/80";
+                    metaVal.className = "font-headline-sm text-headline-sm text-error font-bold";
+                } else {
+                    metaCard.className = "bg-secondary-fixed/10 p-md rounded-xl border border-secondary-fixed/20 cursor-pointer hover:bg-secondary-fixed/20 transition-colors";
+                    metaIcon.className = "material-symbols-outlined text-secondary";
+                    metaTrendIcon.className = "material-symbols-outlined text-[18px] text-secondary";
+                    metaTrendIcon.innerText = "trending_down";
+                    metaTitle.className = "font-label-sm text-label-sm text-on-secondary-fixed-variant";
+                    metaVal.className = "font-headline-sm text-headline-sm text-secondary font-bold";
+                }
+            } else {
+                metaTrendIcon.classList.add('hidden');
+            }
             
             const now = new Date();
             const dayOfMonth = now.getDate();
