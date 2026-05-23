@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "875100013221-ssn7b2e69ht5afhr9m0o09m15kp3f1ca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.minhasdespesas.app",
+            "certificate_hash": "e45d8c9adebf74b6454a459e00c46e8e80962470"
+          }
+        },
+        {
           "client_id": "875100013221-vdlbvmhf8p3o0d3e5j82h6oi6cg2h2ub.apps.googleusercontent.com",
           "client_type": 3
         }
