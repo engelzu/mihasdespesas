@@ -1,0 +1,56 @@
+===========================================================
+  COMO GERAR O SEU APLICATIVO (.APK) COM O IONIC APPFLOW
+===========================================================
+
+Este documento serve como um lembrete de como o seu arquivo
+.apk (o aplicativo Android para instalar no celular) é gerado
+automaticamente pela nuvem.
+
+-----------------------------------------------------------
+1. O QUE É O IONIC APPFLOW?
+-----------------------------------------------------------
+O Ionic Appflow é um serviço nas nuvens oficial dos criadores
+do Capacitor (a ferramenta que usamos para transformar o seu 
+código web em um aplicativo nativo). 
+
+Ele serve para você não precisar instalar programas pesados
+como o Android Studio no seu computador. Ele cria o .apk
+diretamente nos servidores deles!
+
+Site: https://ionic.io/appflow
+
+-----------------------------------------------------------
+2. COMO FUNCIONA A INTEGRAÇÃO?
+-----------------------------------------------------------
+O seu Appflow está conectado diretamente à sua conta do GitHub:
+Repositório: https://github.com/engelzu/mihasdespesas.git
+
+Toda a mágica acontece automaticamente quando você manda as 
+suas atualizações para o GitHub.
+
+-----------------------------------------------------------
+3. PASSO A PASSO PARA GERAR UM NOVO .APK
+-----------------------------------------------------------
+Toda vez que você fizer alterações no código (ex: mudar um 
+botão, texto ou tela), siga estes passos:
+
+PASSO A (Prepara os arquivos do seu aplicativo):
+Abra o Prompt de Comando na pasta "usuario" e digite:
+> node build.js
+
+PASSO B (Envia pro GitHub):
+Ainda na pasta "usuario", digite:
+> git add .
+> git commit -m "Minha atualização"
+> git push
+
+PASSO C (Gerar o APK no site):
+1. O envio (push) para o GitHub acionará o Appflow automaticamente.
+2. Acesse sua conta no site do Appflow (https://ionic.io/appflow).
+3. Vá no painel do seu projeto.
+4. Você verá que um novo "Build" começou a ser processado sozinho.
+5. Quando terminar (ficar verde), basta clicar em "Download" e 
+   baixar o seu arquivo .apk!
+
+Você pode transferir este arquivo .apk para o seu celular via
+cabo USB, Google Drive ou WhatsApp, e instalar!

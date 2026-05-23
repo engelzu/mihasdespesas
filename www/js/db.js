@@ -44,8 +44,17 @@ async function registerWithEmail(email, password) {
 
 async function loginWithGoogle() {
     try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const userCred = await firebase.auth().signInWithPopup(provider);
+        let userCred;
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            // Usa o Plugin Nativo do Capacitor
+            const result = await window.Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle();
+            const credential = firebase.auth.GoogleAuthProvider.credential(result.credential.idToken);
+            userCred = await firebase.auth().signInWithCredential(credential);
+        } else {
+            // Usa a versão Web (Popup)
+            const provider = new firebase.auth.GoogleAuthProvider();
+            userCred = await firebase.auth().signInWithPopup(provider);
+        }
         
         // Check if profile exists, if not, create it
         const docRef = db.collection('users').doc(userCred.user.uid);
