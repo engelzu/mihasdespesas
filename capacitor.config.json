@@ -1,5 +1,11 @@
 {
   "appId": "br.com.minhasdespesas.app",
   "appName": "MinhasDespesas",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    }
+  }
 }
