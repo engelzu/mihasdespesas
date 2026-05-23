@@ -2,7 +2,7 @@
 
 **Última atualização:** 22 de maio de 2026
 
-O desenvolvedor do aplicativo **Minhas Despesas** criou este app como um aplicativo gratuito (Free). Este SERVIÇO é fornecido sem custo e deve ser usado no estado em que se encontra.
+O desenvolvedor do aplicativo **Minhas Despesas** criou este app como um aplicativo comercial (Pago). Este SERVIÇO é fornecido e deve ser usado no estado em que se encontra.
 
 Esta página é usada para informar os visitantes sobre as nossas políticas relativas à coleta, uso e divulgação de Informações Pessoais de quem decide usar o nosso Serviço.
 
