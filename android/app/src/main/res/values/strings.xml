@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">MinhasDespesas</string>
-    <string name="title_activity_main">MinhasDespesas</string>
-    <string name="package_name">br.com.minhasdespesas.app</string>
-    <string name="custom_url_scheme">br.com.minhasdespesas.app</string>
+    <string name="app_name">Minhas Despesas</string>
+    <string name="title_activity_main">Minhas Despesas</string>
+    <string name="package_name">com.engelmobile.minhasdespesas</string>
+    <string name="custom_url_scheme">com.engelmobile.minhasdespesas</string>
 </resources>

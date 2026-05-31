@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f9f9f9">
+<link rel="manifest" href="../manifest.json">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/db.js"></script>
+<script src="../js/app.js"></script>
+<title>Histórico e Exportar - minhasdespesas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#dadada",
+                    "secondary-container": "#66fc88",
+                    "tertiary": "#003e7e",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#001b3d",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#4f4253",
+                    "on-error": "#ffffff",
+                    "on-background": "#1a1c1c",
+                    "on-primary-container": "#edb9ff",
+                    "surface-bright": "#f9f9f9",
+                    "primary-fixed-dim": "#eab2ff",
+                    "background": "#f9f9f9",
+                    "surface": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#00468c",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#f3f3f3",
+                    "tertiary-container": "#0055a8",
+                    "surface-tint": "#941cc7",
+                    "primary-container": "#8a05be",
+                    "secondary-fixed-dim": "#48e171",
+                    "surface-container-high": "#e8e8e8",
+                    "outline": "#817284",
+                    "tertiary-fixed": "#d6e3ff",
+                    "on-primary-fixed": "#320047",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#00722f",
+                    "inverse-surface": "#2f3131",
+                    "secondary-fixed": "#69ff8b",
+                    "primary": "#670090",
+                    "on-secondary-fixed": "#002108",
+                    "surface-variant": "#e2e2e2",
+                    "primary-fixed": "#f7d8ff",
+                    "tertiary-fixed-dim": "#a9c7ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "inverse-on-surface": "#f1f1f1",
+                    "on-tertiary-container": "#b2cdff",
+                    "outline-variant": "#d3c1d5",
+                    "inverse-primary": "#eab2ff",
+                    "secondary": "#006e2c",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#005320",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-primary-fixed-variant": "#7400a0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "sm": "12px",
+                    "container-margin": "20px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+        }
+        .expense-card-shadow {
+            box-shadow: 0 4px 12px rgba(47, 49, 49, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background docked full-width top-0 z-50 border-b border-outline-variant/30 flat no shadows flex items-center justify-between px-md pb-xs w-full sticky pt-[max(env(safe-area-inset-top),8px)]">
+<div class="flex items-center gap-md">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary dark:text-primary-fixed-dim">minhasdespesas</h1>
+</div>
+<button onclick="openProfileModal()" class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-[28px]">account_circle</span>
+</button>
+</header>
+
+<!-- Profile Modal -->
+<div id="profile-modal" class="fixed inset-0 z-[110] bg-inverse-surface/60 backdrop-blur-sm hidden flex items-center justify-center sm:p-container-margin opacity-0 transition-opacity duration-300">
+    <div class="bg-surface rounded-2xl w-full max-w-[280px] shadow-2xl transition-all duration-300 transform scale-95 flex flex-col overflow-hidden m-4">
+        <div class="bg-primary p-4 shadow-sm relative z-10 flex items-center justify-between">
+            <h3 class="font-headline-sm text-[16px] text-white font-bold">Meu Perfil</h3>
+            <button onclick="closeProfileModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+        <div class="p-6 flex flex-col items-center gap-3">
+            <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[36px]">account_circle</span>
+            </div>
+            <div class="text-center w-full mb-2">
+                <p class="font-label-sm text-[9px] text-outline uppercase tracking-wider mb-1">Logado como</p>
+                <p class="font-headline-sm text-[14px] text-on-surface font-bold truncate px-2" id="profile-email-display">carregando...</p>
+            </div>
+            <div class="w-full h-px bg-outline-variant/30 my-1"></div>
+            <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-error/10 text-error font-bold flex items-center justify-center gap-2 hover:bg-error/20 transition-colors text-[14px]">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                Sair do App
+            </button>
+        </div>
+    </div>
+</div>
+
+<main class="max-w-4xl mx-auto px-container-margin mt-lg">
+<!-- Export Section (The Glassmorphism Action Card) -->
+<section class="mb-xl">
+<div class="glass-effect rounded-xl p-lg flex flex-col md:flex-row md:items-center justify-between gap-md expense-card-shadow">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-base">Exportar Dados</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Gere um relatório completo em Excel ou visualize um extrato estilo cupom fiscal na tela.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-sm w-full md:w-auto mt-md">
+    <button onclick="exportToCSV()" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg flex items-center justify-center gap-xs hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 shadow-lg shadow-primary/30">
+        <span class="material-symbols-outlined text-[20px]">description</span>
+        Excel
+    </button>
+    <button onclick="generateReceipt()" class="bg-surface-container-high text-on-surface font-label-md text-label-md px-md py-sm rounded-lg flex items-center justify-center gap-xs hover:bg-surface-dim transition-all active:scale-95 shadow-lg shadow-surface-container-high/30 border border-outline-variant/40">
+        <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+        Cupom Fiscal
+    </button>
+</div>
+</div>
+</section>
+<!-- Filters -->
+<div class="mb-lg space-y-md">
+    <!-- Month Filter -->
+    <div class="space-y-xs">
+        <label class="font-label-md text-label-md text-outline" for="month-filter">Mês de Referência</label>
+        <div class="relative">
+            <select id="month-filter" class="w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/40 rounded-t-lg px-md py-sm transition-all focus:bg-white text-on-surface font-headline-sm outline-none focus:ring-2 focus:ring-primary/20" onchange="handleMonthChange()">
+                <option value="all">Todos os Meses</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Category Pills -->
+    <div class="flex flex-col md:flex-row gap-md mb-lg">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
+<input id="search-input" oninput="handleSearch()" class="w-full pl-[44px] pr-md py-sm bg-surface-container-lowest border-none border-b-2 border-outline-variant focus:ring-0 focus:border-primary font-body-md text-body-md transition-all outline-none focus:ring-2 focus:ring-primary/20" placeholder="Buscar despesa..." type="text"/>
+</div>
+<div class="flex gap-xs overflow-x-auto pb-xs" id="category-filters-container">
+<!-- Populated via JS -->
+</div>
+</div>
+<!-- History Content -->
+<div class="space-y-xl" id="history-container">
+<!-- Will be rendered dynamically -->
+</div>
+<!-- Empty State Illustration Placeholder (Asymmetric layout element) -->
+<div class="mt-xl flex flex-col items-center py-lg opacity-50">
+<div class="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-[48px] text-outline">history_toggle_off</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Fim do histórico visível</p>
+</div>
+
+<!-- Cupom Fiscal Modal -->
+<div id="receipt-modal" class="fixed inset-0 z-[100] bg-inverse-surface/60 backdrop-blur-sm hidden flex flex-col items-center justify-center px-container-margin opacity-0 transition-opacity duration-300">
+    <div class="bg-[#FFFDF0] p-lg w-full max-w-sm shadow-2xl flex flex-col relative max-h-[80vh] overflow-hidden rounded-sm" style="font-family: 'Courier New', Courier, monospace; color: #2C2C2C;">
+        
+        <!-- Header -->
+        <div class="text-center mt-sm border-b-2 border-dashed border-gray-400 pb-sm mb-sm">
+            <h3 class="font-bold text-[18px]">APP MINHAS DESPESAS</h3>
+            <p class="text-[12px] mt-xs">CUPOM FISCAL NÃO É DOCUMENTO FISCAL</p>
+            <p class="text-[12px] mt-[2px] uppercase font-bold" id="receipt-date"></p>
+        </div>
+        
+        <div class="text-[14px] flex justify-between font-bold mb-xs px-xs">
+            <span>DESCRIÇÃO</span>
+            <span>VALOR R$</span>
+        </div>
+        
+        <!-- Items -->
+        <div id="receipt-items" class="overflow-y-auto flex-1 text-[13px] space-y-[4px] pb-sm border-b-2 border-dashed border-gray-400 mb-sm no-scrollbar px-xs">
+            <!-- Items rendered here -->
+        </div>
+        
+        <!-- Footer -->
+        <div class="flex justify-between font-bold text-[14px] mb-[2px] px-xs text-secondary">
+            <span>RECEITAS R$</span>
+            <span id="receipt-total-income"></span>
+        </div>
+        <div class="flex justify-between font-bold text-[14px] mb-[2px] px-xs text-error">
+            <span>DESPESAS R$</span>
+            <span id="receipt-total-expense"></span>
+        </div>
+        <div class="flex justify-between font-bold text-[16px] mb-md px-xs border-t border-dashed border-gray-400 pt-[2px] mt-[2px]">
+            <span>SALDO R$</span>
+            <span id="receipt-total-net"></span>
+        </div>
+        
+        <p class="text-center text-[10px] mb-md text-gray-500">Obrigado por usar Minhas Despesas!</p>
+        
+        <div class="flex justify-center mt-xs">
+            <button onclick="closeReceipt()" class="bg-inverse-surface text-inverse-on-surface rounded-full px-md py-sm flex items-center justify-center shadow-lg active:scale-95 transition-transform hover:bg-inverse-surface/80">
+                <span class="material-symbols-outlined text-[20px] mr-xs">close</span>
+                Fechar
+            </button>
+        </div>
+    </div>
+</div>
+
+</main>
+<!-- Bottom Navigation with Glassmorphism -->
+<nav class="fixed bottom-0 w-full bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-center px-gutter pb-6 pt-xs z-50 transition-all">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-lowest transition-all p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-lowest transition-all p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-md text-label-md">Adicionar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold hover:bg-surface-container-lowest transition-all p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Histórico</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-lowest transition-all p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">ios_share</span>
+<span class="font-label-md text-label-md">Exportar</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions and effects
+        function applyCardEffects() {
+            document.querySelectorAll('.expense-card-shadow').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-2px)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        async function populateCategoryFilters() {
+            const container = document.getElementById('category-filters-container');
+            const userCategories = await getCategories();
+            const categories = ['Todos', ...userCategories];
+            
+            container.innerHTML = categories.map((cat, index) => {
+                if (index === 0) {
+                    return `<span class="bg-surface-container-high text-on-surface font-label-md text-label-md px-md py-xs rounded-full whitespace-nowrap cursor-pointer hover:bg-surface-dim transition-colors category-pill">${cat}</span>`;
+                }
+                return `<span class="bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-md py-xs rounded-full border border-outline-variant whitespace-nowrap cursor-pointer hover:bg-surface-container-low transition-colors category-pill">${cat}</span>`;
+            }).join('');
+            
+            const pills = document.querySelectorAll('.category-pill');
+            pills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pills.forEach(p => {
+                        p.classList.remove('bg-surface-container-high', 'text-on-surface');
+                        p.classList.add('bg-surface-container-lowest', 'text-on-surface-variant', 'border', 'border-outline-variant');
+                    });
+                    pill.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant', 'border', 'border-outline-variant');
+                    pill.classList.add('bg-surface-container-high', 'text-on-surface');
+                    
+                    const filter = pill.innerText;
+                    renderHistory(filter === 'Todos' ? null : filter);
+                });
+            });
+        }
+
+        let currentExpensesRendered = [];
+
+        async function populateMonthFilter() {
+            const expenses = await getExpenses();
+            const select = document.getElementById('month-filter');
+            
+            // Extract unique months
+            const months = new Set();
+            expenses.forEach(exp => {
+                const dateObj = new Date(exp.date + 'T12:00:00');
+                const monthYear = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                const capitalized = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+                months.add(capitalized);
+            });
+            
+            // Convert to array and sort theoretically (or just keep order)
+            const monthsArr = Array.from(months);
+            monthsArr.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.innerText = m;
+                select.appendChild(opt);
+            });
+            
+            // Auto-select current month if it exists in list
+            const now = new Date();
+            const currMonthYear = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const currCapitalized = (currMonthYear.charAt(0).toUpperCase() + currMonthYear.slice(1)).trim();
+            if (monthsArr.includes(currCapitalized)) {
+                select.value = currCapitalized;
+            }
+        }
+
+        function handleMonthChange() {
+            const activePill = document.querySelector('.bg-surface-container-high.text-on-surface');
+            const filter = activePill ? activePill.innerText : 'Todos';
+            renderHistory(filter === 'Todos' ? null : filter);
+        }
+
+        function handleSearch() {
+            const activePill = document.querySelector('.bg-surface-container-high.text-on-surface');
+            const filter = activePill ? activePill.innerText : 'Todos';
+            renderHistory(filter === 'Todos' ? null : filter);
+        }
+
+        async function renderHistory(categoryFilter = null) {
+            const container = document.getElementById('history-container');
+            const monthSelect = document.getElementById('month-filter');
+            const monthFilter = monthSelect ? monthSelect.value : 'all';
+            
+            let expenses = await getExpenses();
+            
+            if (categoryFilter) {
+                expenses = expenses.filter(e => e.category === categoryFilter);
+            }
+            
+            if (monthFilter !== 'all') {
+                expenses = expenses.filter(e => {
+                    const dateObj = new Date(e.date + 'T12:00:00');
+                    const m = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                    return m.toLowerCase().trim() === monthFilter.toLowerCase().trim();
+                });
+            }
+
+            const searchInput = document.getElementById('search-input');
+            const searchFilter = searchInput ? searchInput.value.toLowerCase() : '';
+            if (searchFilter) {
+                expenses = expenses.filter(e => e.description.toLowerCase().includes(searchFilter));
+            }
+
+            currentExpensesRendered = expenses;
+
+            if (expenses.length === 0) {
+                container.innerHTML = '<p class="text-center py-xl text-on-surface-variant">Nenhuma despesa encontrada.</p>';
+                return;
+            }
+
+            // Group by month
+            const groups = {};
+            expenses.forEach(exp => {
+                const dateObj = new Date(exp.date + 'T12:00:00');
+                const monthYear = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                const capitalized = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+                if (!groups[capitalized]) {
+                    groups[capitalized] = { total: 0, items: [] };
+                }
+                groups[capitalized].total += parseFloat(exp.amount);
+                groups[capitalized].items.push(exp);
+            });
+
+            let html = '';
+            for (const [month, data] of Object.entries(groups)) {
+                html += `
+                    <section>
+                        <div class="flex items-center justify-between mb-md border-b border-outline-variant/20 pb-xs">
+                        <h3 class="font-headline-sm text-headline-sm text-primary">${month}</h3>
+                        <span class="font-label-md text-label-md text-on-surface-variant">Total: ${formatCurrency(data.total)}</span>
+                        </div>
+                        <div class="space-y-md">
+                `;
+                
+                data.items.forEach(exp => {
+                    const dateObj = new Date(exp.date + 'T12:00:00');
+                    const day = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+                    
+                    const isIncome = exp.type === 'income';
+                    const amountColor = isIncome ? 'text-secondary' : 'text-error';
+                    const amountSign = isIncome ? '+' : '-';
+                    const iconColor = isIncome ? 'text-secondary' : 'text-primary';
+                    const bgIconColor = isIncome ? 'bg-secondary/10' : 'bg-surface-container-low';
+                    const iconName = isIncome ? 'add' : getIconForCategory(exp.category);
+
+                    html += `
+                        <div class="bg-surface-container-lowest p-md rounded-lg flex items-center justify-between border border-neutral-200 expense-card-shadow hover:scale-[1.01] transition-transform cursor-pointer">
+                        <div class="flex items-center gap-md">
+                        <div class="w-10 h-10 rounded-full ${bgIconColor} flex items-center justify-center ${iconColor}">
+                        <span class="material-symbols-outlined">${iconName}</span>
+                        </div>
+                        <div>
+                        <p class="font-body-lg text-body-lg font-bold text-on-surface">${exp.description}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant">${day} • ${exp.category}${exp.paymentMethod ? ' • ' + exp.paymentMethod : ''}</p>
+                        </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-1">
+                        <p class="font-body-lg text-body-lg font-bold ${amountColor}">${amountSign} ${formatCurrency(exp.amount)}</p>
+                        <button onclick="handleDeleteExpense('${exp.id}')" class="text-outline-variant hover:text-error transition-colors flex items-center justify-center p-1 rounded-full hover:bg-error/10" title="Excluir">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                        </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></section>`;
+            }
+            container.innerHTML = html;
+            applyCardEffects();
+        }
+
+        function exportToCSV() {
+            const expenses = currentExpensesRendered;
+            if(expenses.length === 0) return customAlert('Nenhum dado para exportar com os filtros atuais.');
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Data,Descrição,Tipo,Categoria,Forma de Pagamento,Valor\n";
+            
+            expenses.forEach(function(rowArray) {
+                let tipo = rowArray.type === 'income' ? 'Receita' : 'Despesa';
+                let row = `"${rowArray.date}","${rowArray.description}","${tipo}","${rowArray.category}","${rowArray.paymentMethod || ''}","${rowArray.amount}"`;
+                csvContent += row + "\r\n";
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `despesas_export.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function generateReceipt() {
+            const monthSelect = document.getElementById('month-filter');
+            const selectedMonth = monthSelect.value;
+            
+            if (selectedMonth === 'all') {
+                customAlert('Por favor, selecione um Mês de Referência específico na lista acima para gerar o extrato.');
+                return;
+            }
+            
+            const expenses = await getExpenses();
+            const filtered = expenses.filter(exp => {
+                const d = new Date(exp.date + 'T12:00:00');
+                const monthYear = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                return monthYear.toLowerCase().trim() === selectedMonth.toLowerCase().trim();
+            });
+            
+            if (filtered.length === 0) {
+                customAlert('Nenhuma despesa encontrada para o mês selecionado.');
+                return;
+            }
+            
+            const receiptModal = document.getElementById('receipt-modal');
+            const receiptItems = document.getElementById('receipt-items');
+            const receiptTotal = document.getElementById('receipt-total');
+            const receiptDate = document.getElementById('receipt-date');
+            
+            receiptDate.innerText = `EXTRATO: ${selectedMonth.toUpperCase()}`;
+            
+            let totalIncome = 0;
+            let totalExpense = 0;
+            receiptItems.innerHTML = filtered.map(exp => {
+                let amount = parseFloat(exp.amount);
+                let isIncome = exp.type === 'income';
+                if (isIncome) totalIncome += amount;
+                else totalExpense += amount;
+                
+                let desc = exp.description.substring(0, 15).toUpperCase();
+                return `
+                    <div class="flex justify-between items-center ${isIncome ? 'text-secondary' : ''}">
+                        <span class="truncate pr-xs">${desc}</span>
+                        <span class="flex-shrink-0">${isIncome ? '+' : '-'} ${amount.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('receipt-total-income').innerText = totalIncome.toFixed(2).replace('.', ',');
+            document.getElementById('receipt-total-expense').innerText = totalExpense.toFixed(2).replace('.', ',');
+            document.getElementById('receipt-total-net').innerText = (totalIncome - totalExpense).toFixed(2).replace('.', ',');
+            
+            receiptModal.classList.remove('hidden');
+            setTimeout(() => {
+                receiptModal.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closeReceipt() {
+            const receiptModal = document.getElementById('receipt-modal');
+            receiptModal.classList.add('opacity-0');
+            setTimeout(() => {
+                receiptModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function handleDeleteExpense(id) {
+            customConfirm('Tem certeza que deseja excluir esta despesa?', async () => {
+                await deleteExpense(id);
+                renderHistory();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.replace('../boas_vindas/code.html');
+                    return;
+                }
+                populateMonthFilter();
+                populateCategoryFilters();
+                renderHistory();
+            });
+        });
+
+        window.openProfileModal = function() {
+            const modal = document.getElementById('profile-modal');
+            const emailDisplay = document.getElementById('profile-email-display');
+            
+            try {
+                const user = firebase.auth().currentUser;
+                if (user && user.email) {
+                    emailDisplay.textContent = user.email;
+                } else {
+                    emailDisplay.textContent = 'Usuário Anônimo';
+                }
+            } catch (e) {
+                emailDisplay.textContent = 'Usuário não logado';
+            }
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        };
+
+        window.closeProfileModal = function() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.remove('scale-100');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        };
+    </script>
+</body></html>

@@ -1,11 +1,5 @@
 {
-  "appId": "br.com.minhasdespesas.app",
-  "appName": "MinhasDespesas",
-  "webDir": "www",
-  "plugins": {
-    "FirebaseAuthentication": {
-      "skipNativeAuth": false,
-      "providers": ["google.com"]
-    }
-  }
+  "appId": "com.engelmobile.minhasdespesas",
+  "appName": "Minhas Despesas",
+  "webDir": "www"
 }

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Gestão de Usuários</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #111827;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* View de Login */
+        #loginView {
+            text-align: center;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #6366f1;
+        }
+
+        button {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #059669;
+        }
+
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* View do Dashboard */
+        #dashboardView {
+            display: none;
+            /* Escondido inicialmente */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .message.error {
+            display: block;
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message.info {
+            display: block;
+            background-color: #e0f2fe;
+            color: #075985;
+        }
+
+        /* Loader */
+        #loader {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Tela de Login -->
+        <div id="loginView">
+            <h2>Painel Admin</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">Insira a senha mestra para acessar a lista de usuários.</p>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="password">Senha de Administrador</label>
+                    <input type="password" id="password" placeholder="Digite a senha" required>
+                </div>
+                <button type="submit" class="btn-full" id="loginBtn">Entrar no Painel</button>
+            </form>
+            <div id="loginMessage" class="message"></div>
+        </div>
+
+        <!-- Tela do Dashboard -->
+        <div id="dashboardView">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Usuários Cadastrados</h2>
+                <button id="logoutBtn" style="background-color: #ef4444;">Sair</button>
+            </div>
+
+            <div id="dashboardMessage" class="message"></div>
+            <div id="loader">Carregando usuários...</div>
+
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>E-mail</th>
+                        <th>Data de Cadastro</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Usuários serão injetados aqui -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // Elementos Globais
+        let currentPassword = '';
+
+        const loginView = document.getElementById('loginView');
+        const dashboardView = document.getElementById('dashboardView');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginMessage = document.getElementById('loginMessage');
+        const dashboardMessage = document.getElementById('dashboardMessage');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const loader = document.getElementById('loader');
+
+        // Função: Realizar Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Verificando...';
+            loginMessage.className = 'message';
+
+            // Vamos testar a senha tentando buscar os usuários
+            const success = await loadUsers(password);
+
+            if (success) {
+                currentPassword = password;
+                loginView.style.display = 'none';
+                dashboardView.style.display = 'block';
+            } else {
+                loginMessage.className = 'message error';
+                loginMessage.textContent = 'Senha incorreta ou erro no servidor.';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Entrar no Painel';
+            }
+        });
+
+        // Função: Carregar Usuários
+        async function loadUsers(password) {
+            try {
+                loader.style.display = 'block';
+                usersTableBody.innerHTML = '';
+
+                const response = await fetch('/.netlify/functions/admin_list_users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                if (!response.ok) {
+                    loader.style.display = 'none';
+                    return false;
+                }
+
+                const data = await response.json();
+                renderUsers(data.users);
+                loader.style.display = 'none';
+                return true;
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                return false;
+            }
+        }
+
+        // Função: Renderizar Tabela
+        function renderUsers(users) {
+            usersTableBody.innerHTML = '';
+
+            if (users.length === 0) {
+                usersTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum usuário cadastrado.</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+
+                // Formatar Data
+                const dateObj = new Date(user.creationTime);
+                const formattedDate = dateObj.toLocaleDateString('pt-BR');
+
+                // Status Badge
+                const statusHtml = user.isPaid
+                    ? '<span class="status-badge status-paid">Pago (Acesso Liberado)</span>'
+                    : '<span class="status-badge status-pending">Aguardando</span>';
+
+                // Botão de Ação
+                const actionHtml = user.isPaid
+                    ? `<button onclick="toggleAccess('${user.uid}', 'revoke')" id="btn-${user.uid}" style="background-color: #ef4444; padding: 6px 12px; font-size: 13px;">Bloquear</button>`
+                    : `<button onclick="toggleAccess('${user.uid}', 'approve')" id="btn-${user.uid}" style="padding: 6px 12px; font-size: 13px;">Aprovar PIX</button>`;
+
+                tr.innerHTML = `
+                    <td><strong>${user.email}</strong></td>
+                    <td>${formattedDate}</td>
+                    <td>${statusHtml}</td>
+                    <td>${actionHtml}</td>
+                `;
+                usersTableBody.appendChild(tr);
+            });
+        }
+
+        // Função: Bloquear / Aprovar Acesso (Exposta Globalmente)
+        window.toggleAccess = async function (uid, action) {
+            const msg = action === 'approve' ? 'liberar o acesso' : 'bloquear o acesso';
+            if (!confirm(`Tem certeza que deseja ${msg} para este usuário?`)) return;
+
+            const btn = document.getElementById(`btn-${uid}`);
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processando...';
+
+            dashboardMessage.className = 'message';
+            dashboardMessage.style.display = 'block';
+
+            try {
+                const response = await fetch('/.netlify/functions/admin_approve_pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid, password: currentPassword, action })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    dashboardMessage.className = 'message success';
+                    dashboardMessage.textContent = action === 'approve' ? 'Acesso liberado com sucesso!' : 'Acesso bloqueado com sucesso!';
+                    // Recarregar a lista para atualizar os badges
+                    await loadUsers(currentPassword);
+                } else {
+                    dashboardMessage.className = 'message error';
+                    dashboardMessage.textContent = data.error || 'Erro na operação.';
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (error) {
+                dashboardMessage.className = 'message error';
+                dashboardMessage.textContent = 'Falha ao conectar com o servidor.';
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+
+            // Ocultar mensagem após 5 segundos
+            setTimeout(() => { dashboardMessage.style.display = 'none'; }, 5000);
+        };
+
+        // Função: Sair
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            currentPassword = '';
+            document.getElementById('password').value = '';
+            dashboardView.style.display = 'none';
+            loginView.style.display = 'block';
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Entrar no Painel';
+            loginMessage.style.display = 'none';
+        });
+
+    </script>
+</body>
+
+</html>

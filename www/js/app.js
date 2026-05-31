@@ -1,5 +1,12 @@
 // app.js - Global App Utilities and Navigation
 
+window.onerror = function(message, source, lineno, colno, error) {
+    const errorMsg = "ERRO JS: " + message + " \nLinha: " + lineno + " \nArquivo: " + source;
+    console.error(errorMsg, error);
+    alert(errorMsg);
+    return false;
+};
+
 // Format currency
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', {
@@ -77,8 +84,47 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     if (typeof firebase !== 'undefined') {
         firebase.auth().onAuthStateChanged(user => {
-            if(user && window.location.pathname.indexOf('boas_vindas') === -1) {
-                injectSidebarMenu();
+            if (user) {
+                // Checa o banco de dados depois que confirmar o usuário
+                getProfile().then(profile => {
+                    const path = window.location.pathname;
+                    const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+                    
+                    // Cálculo do período de testes (7 dias)
+                    const trialStart = new Date(profile.trialStartDate);
+                    const now = new Date();
+                    const diffTime = now - trialStart;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                    const isTrialActive = diffDays >= 0 && diffDays <= 7;
+                    const daysRemaining = Math.max(0, 7 - Math.floor(diffDays));
+                    
+                    if (path.indexOf('boas_vindas') === -1 && path.indexOf('paywall') === -1) {
+                        if (!isNative && profile.isPaid !== true && !isTrialActive) {
+                            window.location.replace('../paywall/code.html');
+                            return;
+                        }
+                        
+                        // Exibir modal pós-login sobre os dias restantes do trial
+                        if (profile.isPaid !== true && isTrialActive) {
+                            const sessionKey = 'shown_trial_modal_' + user.uid;
+                            if (!sessionStorage.getItem(sessionKey)) {
+                                sessionStorage.setItem(sessionKey, 'true');
+                                setTimeout(() => {
+                                    showTrialModal(daysRemaining);
+                                }, 500);
+                            }
+                        }
+                    } else if (path.indexOf('paywall') !== -1) {
+                        // Se o usuário está no paywall mas o trial está ativo ou ele pagou, redireciona pro dashboard
+                        if (isNative || profile.isPaid === true || isTrialActive) {
+                            window.location.replace('../dashboard_de_despesas/code.html');
+                        }
+                    }
+                }).catch(err => console.error(err));
+                
+                if(window.location.pathname.indexOf('boas_vindas') === -1) {
+                    injectSidebarMenu();
+                }
             }
         });
     }
@@ -101,7 +147,15 @@ function injectSidebarMenu() {
                     Gerenciar Categorias
                 </button>
                 <div class="flex-1"></div>
-                <button onclick="logout()" class="flex items-center gap-md p-md rounded-lg hover:bg-error/10 text-error w-full text-left font-label-lg transition-colors mt-auto">
+                <button id="install-app-btn" onclick="installPWA()" class="flex items-center gap-md p-md rounded-lg hover:bg-secondary-container/30 text-secondary w-full text-left font-label-lg transition-colors mt-auto mb-xs">
+                    <span class="material-symbols-outlined text-[20px]">install_mobile</span>
+                    Instalar App
+                </button>
+                <button onclick="forceAppUpdate()" class="flex items-center gap-md p-md rounded-lg hover:bg-primary-container/30 text-primary w-full text-left font-label-lg transition-colors mb-xs">
+                    <span class="material-symbols-outlined text-[20px]">update</span>
+                    Atualizar App
+                </button>
+                <button onclick="logout()" class="flex items-center gap-md p-md rounded-lg hover:bg-error/10 text-error w-full text-left font-label-lg transition-colors">
                     <span class="material-symbols-outlined text-[20px]">logout</span>
                     Sair da Conta
                 </button>
@@ -152,13 +206,21 @@ function injectSidebarMenu() {
     
     // Attach event listeners to all menu buttons across the app
     document.querySelectorAll('button, span').forEach(el => {
-        if(el.textContent.trim() === 'menu') {
+        if(el.textContent.trim() === 'menu' && el.classList.contains('material-symbols-outlined')) {
             const btn = el.tagName === 'BUTTON' ? el : el.closest('button');
-            if(btn) btn.addEventListener('click', openSidebar);
+            const target = btn || el;
+            // Remove previous listeners if any to avoid duplicates
+            target.removeEventListener('click', openSidebar);
+            target.style.cursor = 'pointer';
+            target.addEventListener('click', openSidebar);
         }
     });
     
-    document.getElementById('global-sidebar-overlay').addEventListener('click', closeSidebar);
+    const overlay = document.getElementById('global-sidebar-overlay');
+    if(overlay) {
+        overlay.removeEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+    }
 }
 
 function updateStorageUsage() {
@@ -209,6 +271,57 @@ function closeSidebar() {
         overlay.classList.add('hidden');
     }, 300);
 }
+
+window.forceAppUpdate = function() {
+    closeSidebar();
+    customAlert('Buscando atualizações e recarregando o aplicativo...');
+    
+    setTimeout(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(registration => {
+                if (registration) {
+                    registration.update().then(() => {
+                        if (registration.waiting) {
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        } else {
+                            window.location.reload(true);
+                        }
+                    }).catch(() => {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }).catch(() => {
+                window.location.reload(true);
+            });
+        } else {
+            window.location.reload(true);
+        }
+    }, 1500);
+};
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('install-app-btn');
+    if (btn) btn.classList.remove('hidden');
+});
+
+window.installPWA = async function() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            const btn = document.getElementById('install-app-btn');
+            if (btn) btn.classList.add('hidden');
+        }
+        deferredPrompt = null;
+    } else {
+        customAlert('O seu navegador atual não permite instalação automática ou o app já está instalado.\\n\\nSe estiver no iPhone (Safari), toque em "Compartilhar" e "Adicionar à Tela de Início".');
+    }
+};
 
 // Category Admin Logic
 window.openCategoryAdmin = async function() {
@@ -396,3 +509,50 @@ window.customConfirm = (message, onConfirm) => {
 window.customPrompt = (message, defaultValue, onConfirm) => {
     showCustomModal('Editar', message, 'prompt', onConfirm, defaultValue);
 };
+
+function showTrialModal(daysRemaining) {
+    let modalContainer = document.getElementById('trial-modal-container');
+    if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'trial-modal-container';
+        modalContainer.className = 'fixed inset-0 z-[1200] bg-inverse-surface/40 backdrop-blur-sm hidden flex items-center justify-center px-container-margin opacity-0 transition-opacity duration-300';
+        document.body.appendChild(modalContainer);
+    }
+    
+    modalContainer.innerHTML = `
+        <div class="bg-surface-container-lowest p-lg rounded-2xl w-full max-w-sm form-shadow border border-outline-variant/30 scale-95 transition-all duration-300 transform flex flex-col items-center text-center" id="trial-modal-content">
+            <div class="w-16 h-16 bg-gradient-to-br from-primary to-primary-container rounded-full flex items-center justify-center mb-md shadow-lg shadow-primary/20 animate-bounce">
+                <span class="material-symbols-outlined text-[32px] text-white">hourglass_empty</span>
+            </div>
+            <h3 class="font-headline-sm text-headline-sm text-primary mb-sm font-bold">Período de Teste Ativo</h3>
+            <p class="font-body-md text-on-surface-variant mb-md leading-relaxed">
+                Você tem até <span class="font-bold text-primary">${daysRemaining} dias</span> de uso da versão free.
+            </p>
+            <div class="w-full bg-surface-container-low rounded-xl p-md mb-lg border border-outline-variant/20">
+                <p class="font-label-md text-on-surface-variant mb-xs">Após o período de teste:</p>
+                <p class="font-body-md text-on-surface font-semibold">
+                    Você poderá comprar sua licença no valor de <span class="text-secondary font-bold text-lg">R$ 7,00</span> (pagamento único, acesso vitalício).
+                </p>
+            </div>
+            <button id="trial-modal-close-btn" class="w-full py-md bg-primary text-on-primary font-headline-sm rounded-full shadow-lg shadow-primary/30 hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-xs">
+                Entendi, Continuar
+            </button>
+        </div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.classList.remove('opacity-0');
+        document.getElementById('trial-modal-content').classList.remove('scale-95');
+        document.getElementById('trial-modal-content').classList.add('scale-100');
+    }, 10);
+
+    document.getElementById('trial-modal-close-btn').onclick = () => {
+        modalContainer.classList.add('opacity-0');
+        document.getElementById('trial-modal-content').classList.remove('scale-100');
+        document.getElementById('trial-modal-content').classList.add('scale-95');
+        setTimeout(() => {
+            modalContainer.classList.add('hidden');
+        }, 300);
+    };
+}
