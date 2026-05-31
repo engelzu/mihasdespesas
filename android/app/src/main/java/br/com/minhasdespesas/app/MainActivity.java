@@ -1,4 +1,4 @@
-package com.engelmobile.minhasdespesas;
+package br.com.minhasdespesas.app;
 
 import com.getcapacitor.BridgeActivity;
 
