@@ -172,3 +172,13 @@ O histórico permite visualizar, filtrar e exportar os registros financeiros.
     1. O código-fonte é enviado para um repositório (ex: GitHub).
     2. O Ionic Appflow lê o repositório e executa a compilação nos próprios servidores.
     3. Ele gera os pacotes finais (`.aab` e `.apk` para Android, `.ipa` para iOS) prontos para upload direto nas respectivas lojas de aplicativos.
+
+---
+
+## 10. Versionamento e Código-Fonte
+
+O código-fonte completo deste projeto está versionado de forma segura no **GitHub**. Isso garante o histórico de atualizações e facilita a integração com serviços de build na nuvem (como o Ionic Appflow).
+
+*   **Plataforma**: GitHub
+*   **Endereço do Repositório**: `https://github.com/engelzu/mihasdespesas`
+*   **Branch Principal**: `main`
