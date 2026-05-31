@@ -173,6 +173,9 @@ O histórico permite visualizar, filtrar e exportar os registros financeiros.
     2. O Ionic Appflow lê o repositório e executa a compilação nos próprios servidores.
     3. Ele gera os pacotes finais (`.aab` e `.apk` para Android, `.ipa` para iOS) prontos para upload direto nas respectivas lojas de aplicativos.
 
+### 9.3 Status de Publicação
+*   **Google Play Store**: A versão mais recente do aplicativo (com os ajustes de layout, correção de ícones e integração com o modal de perfil e correções de menu) foi enviada com sucesso em formato `.aab` (versão interna 2) e atualmente encontra-se **Em Análise** pela equipe da Google Play Console.
+
 ---
 
 ## 10. Versionamento e Código-Fonte
