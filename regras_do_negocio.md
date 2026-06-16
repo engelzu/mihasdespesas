@@ -1,6 +1,6 @@
 # Regras de Negócio - Minhas Despesas App
 
-Este documento reúne todas as regras de negócio, fluxos de funcionamento, integrações e comportamentos do aplicativo **Minhas Despesas**.
+Este documento reúne todas as regras de negócio, fluxos de funcionamento, integrações e comportamentos do aplicativo **Minhas Despesas**, desenvolvido com o framework **Ionic** e **Capacitor**.
 
 ---
 
@@ -173,8 +173,11 @@ O histórico permite visualizar, filtrar e exportar os registros financeiros.
     2. O Ionic Appflow lê o repositório e executa a compilação nos próprios servidores.
     3. Ele gera os pacotes finais (`.aab` e `.apk` para Android, `.ipa` para iOS) prontos para upload direto nas respectivas lojas de aplicativos.
 
-### 9.3 Status de Publicação
-*   **Google Play Store**: A versão mais recente do aplicativo (com os ajustes de layout, correção de ícones e integração com o modal de perfil e correções de menu) foi enviada com sucesso em formato `.aab` (versão interna 2) e atualmente encontra-se **Em Análise** pela equipe da Google Play Console.
+### 9.3 Status de Publicação e Correção v2 (Ajuste de Ícone)
+*   **Google Play Store**: A versão anterior foi rejeitada devido ao ícone do instalador exibir a logo padrão do Ionic/Capacitor em vez da marca oficial. Em resposta a essa rejeição, realizamos a correção **v2** no dia 16/06/2026:
+    *   **Substituição de Ativos**: Copiamos a logo oficial do app (`images/icone_512x512.png`) para a pasta de entrada de assets e geramos todos os ícones de mipmap (`ic_launcher.png`, `ic_launcher_round.png`, etc.) e telas de splash nativos do Android utilizando a biblioteca `@capacitor/assets`.
+    *   **Incremento de Versão**: Atualizamos a configuração do aplicativo no Android para a versão de build `3` (`versionCode 3`) e nome de versão `1.2` (`versionName "1.2"`) para evitar conflitos de versão no console.
+    *   **Nova Submissão**: O novo arquivo `.aab` gerado no Ionic Appflow com essas alterações foi enviado com sucesso e encontra-se em revisão.
 
 ---
 
